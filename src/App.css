@@ -32,12 +32,40 @@
   height: 100%;
 }
 
+.visual-container{
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+.blip-box{
+/*  height: 100%;
+  width: 100%;*/
+}
+
 .blip {
-  height: 100px;
-  width: 100px;
-  border-radius: 100px;
-/*  position: absolute;*/
-  transition: opacity .5s ease-out;
+/*  height: 100px;
+  width: 100px;*/
+  border-radius: 1000px;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  margin: auto;
+  transition: transform 2s cubic-bezier(0.55, 0.085, 0.68, 0.53), opacity 4s;
+}
+
+.cloud {
+/*  height: 100px;
+  width: 100px;*/
+  border-radius: 1000px;
+  position: absolute;
+  transition: transform 30s ease-out, opacity 2s;
 }
 
 @keyframes App-logo-spin {

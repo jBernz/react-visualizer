@@ -12,9 +12,12 @@ class App extends Component {
     this.state = {isPlaying: false};
 
     this.audio = new Audio(darkMoon);
+    this.songTempo = 128;
+
     this.toggleAudio = this.toggleAudio.bind(this);
     this.updateVisuals = this.updateVisuals.bind(this);
     this.createBlip = this.createBlip.bind(this);
+    this.createClouds = this.createClouds.bind(this);
     this.blipBox = React.createRef();
   }
 
@@ -36,37 +39,53 @@ class App extends Component {
   }
 
   toggleAudio() {
-
     this.setState(prevState => ({
       isPlaying: !prevState.isPlaying
     }), () => {
-      this.state.isPlaying ? this.audio.play() : this.audio.pause();
-    })
+      if(this.state.isPlaying){
+        this.audio.play() 
+        this.beatInterval = setInterval(this.createBlip, 60000/this.songTempo);
+        this.starInterval = setInterval(this.createClouds, 60000/(this.songTempo/8));
+      } else {
+        this.audio.pause();
+        clearInterval(this.beatInterval);
+        clearInterval(this.starInterval);
+      }
+    }) 
 
   }
 
   updateVisuals() {
+    const BUFFER_SIZE = 16;
+
     requestAnimationFrame(this.updateVisuals);
     this.analyser.getByteFrequencyData(this.frequencyData);
 
-    console.log(this.frequencyData.slice(0, this.frequencyData.length/4))
+    // console.log(this.frequencyData.slice(0, this.frequencyData.length/8))
 
     //If amplitude is a peak, create a Blip
-    let total = this.frequencyData.slice(0, this.frequencyData.length/4).reduce((p,c)=>p+c);
-    if(this.buffer.filter(t=>t>total).length == 0 && total > 0){
-      this.createBlip();
-    }
+    let total = this.frequencyData.slice(0, this.frequencyData.length/2).reduce((p,c)=>p+c);
+
+    this.amplitude = (total/(16*256))**2;
+
+    // if(this.buffer.filter(t=>t>total).length == 0 && total > 0){
+    //   this.createBlip();
+    // }
 
     //Update amplitude buffer
     this.buffer = this.buffer.concat(total);
-    if(this.buffer.length > 16){
+    if(this.buffer.length > BUFFER_SIZE) {
       this.buffer = this.buffer.slice(1,this.buffer.length-1);
     }
   }
 
 
-  createBlip() {
-    this.blipBox.current.createBlip();
+  createBlip () {
+    this.blipBox.current.createBlip(this.amplitude);
+  }
+
+  createClouds() {
+    this.blipBox.current.createClouds(this.amplitude);
   }
 
 
@@ -76,7 +95,9 @@ class App extends Component {
         <button className={"play-button " + (this.state.isPlaying ? 'hidden' : 'show')}>
           <img src={arrow}/>
         </button>
-        <BlipBox ref={this.blipBox}></BlipBox>
+        <div className={"visual-container " + (this.state.isPlaying ? 'show' : 'hidden')}> 
+          <BlipBox ref={this.blipBox}></BlipBox>
+        </div>
       </div>
     );
   }
