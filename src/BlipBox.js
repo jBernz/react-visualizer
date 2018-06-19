@@ -5,7 +5,7 @@ class BlipBox extends Component {
 	constructor(props){
 		super(props);
 
-		this.state = {blips:[], blipCount: 0, clouds:[], cloudCount: 0};
+		this.state = {blips:[], blipCount: 0, clouds:[], cloudCount: 0, stars:[], starCount: 0};
 		this.createBlip = this.createBlip.bind(this);
 	}
 
@@ -28,11 +28,22 @@ class BlipBox extends Component {
 	  		this.setState({...this.state, clouds: this.state.clouds.slice(4)});
 		}, 16000);
 
+	}
+
+  	createStars(amplitude) {
+  		for(let i=0; i<16; i++){
+  			console.log('star')
+  			const star = <Star key={this.state.starCount}></Star>;
+	    	this.setState({stars: this.state.stars.concat(star), starCount: ++this.state.starCount});
+  		}
+		setTimeout(()=>{
+	  		this.setState({...this.state, stars: this.state.stars.slice(16)});
+		}, 30000);
   	}
 
 	render(){
 		return (
-			<div className='blip-box'>{this.state.blips}{this.state.clouds}</div>
+			<div className='blip-box'>{this.state.stars}{this.state.blips}{this.state.clouds}</div>
 		);
 	}
 }
@@ -67,7 +78,9 @@ class Blip extends Component {
 
 class Cloud extends Component {
 	constructor(props){
-		super(props) 
+		super(props);
+
+		console.log('cloud?')
 	
 		let brightness = Math.round(Math.random()*255);
 		let size = Math.round(Math.random()*15);
@@ -87,17 +100,53 @@ class Cloud extends Component {
 			width: `${size*1.3}%`
 		};
 
-		console.log(this.state.left)
 	}
 
 	componentDidMount(){
-		setTimeout(()=>{this.setState({...this.state, opacity: 0.8, transform: 'translateX(200px)'})}, 100);
+		setTimeout(()=>{this.setState({...this.state, opacity: 0.3, transform: 'translateX(200px)'})}, 100);
 		setTimeout(()=>{this.setState({...this.state, opacity: 0})}, 5000);
 	}
 
 	render(){
 		return(
 			<div className='cloud' style={this.state}></div>
+		);
+	}
+}
+
+class Star extends Component {
+	constructor(props){
+		super(props); 
+
+		let angle = Math.floor(Math.random()*360);
+
+		this.state = {
+			originalAngle: angle,
+			style: {
+				transform: `rotate(${angle}deg)`,
+				width: `${Math.floor(Math.random()*600)}px`,
+				opacity: 0
+			},
+			color: {
+				background: `rgb(
+					${Math.round(Math.random()*255)},
+					${Math.round(Math.random()*255)},
+					${Math.round(Math.random()*255)})`
+			}
+		};
+
+	}
+
+	componentDidMount(){
+		setTimeout(()=>{this.setState({...this.state, style: {...this.state.style, opacity: 0.8, transform: `rotate(${this.state.originalAngle+90}deg)`}})}, 100);
+		setTimeout(()=>{this.setState({...this.state, style: {...this.state.style, opacity: 0}})}, 25000);
+	}
+ 
+	render(){
+		return(
+			<div className='star' style={this.state.style}>
+				<div className='twinkle' style={this.state.color}></div>
+			</div>
 		);
 	}
 }

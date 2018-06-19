@@ -18,6 +18,7 @@ class App extends Component {
     this.updateVisuals = this.updateVisuals.bind(this);
     this.createBlip = this.createBlip.bind(this);
     this.createClouds = this.createClouds.bind(this);
+    this.createStars = this.createStars.bind(this);
     this.blipBox = React.createRef();
   }
 
@@ -45,11 +46,13 @@ class App extends Component {
       if(this.state.isPlaying){
         this.audio.play() 
         this.beatInterval = setInterval(this.createBlip, 60000/this.songTempo);
-        this.starInterval = setInterval(this.createClouds, 60000/(this.songTempo/8));
+        this.cloudInterval = setInterval(this.createClouds, 60000/(this.songTempo/8));
+        setTimeout(this.createStars, 0);
+        this.starInterval = setInterval(this.createStars, 60000/(this.songTempo/32));
       } else {
         this.audio.pause();
         clearInterval(this.beatInterval);
-        clearInterval(this.starInterval);
+        clearInterval(this.cloudInterval);
       }
     }) 
 
@@ -86,6 +89,10 @@ class App extends Component {
 
   createClouds() {
     this.blipBox.current.createClouds(this.amplitude);
+  }
+
+  createStars() {
+    this.blipBox.current.createStars(this.amplitude);
   }
 
 
